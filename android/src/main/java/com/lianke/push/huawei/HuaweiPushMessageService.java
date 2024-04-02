@@ -6,7 +6,6 @@ import android.text.TextUtils;
 import com.huawei.hms.push.HmsMessageService;
 import com.lianke.push.PushKit;
 import com.lianke.push.PushType;
-import com.lianke.push.utils.MainThreadUtil;
 
 public class HuaweiPushMessageService extends HmsMessageService {
 

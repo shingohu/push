@@ -2,7 +2,6 @@ package com.lianke.push;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -16,11 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-
-import com.xiaomi.mipush.sdk.MiPushClient;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -86,7 +81,7 @@ public class PushPlugin implements FlutterPlugin, MethodCallHandler, ActivityAwa
         } else if ("register".equals(method)) {
             register();
             result.success(true);
-        } else if ("unRegister".equals(method)) {
+        } else if ("unregister".equals(method)) {
             unRegister();
             result.success(true);
         }

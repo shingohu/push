@@ -50,12 +50,13 @@ public class PushKit {
     }
 
     public void register(PushListener pushListener) {
-        if (this.listener != null) {
-            return;
-        }
         this.listener = pushListener;
         if (isSupport(PushType.XiaoMi) && shouldInit(context)) {
             MiPushClient.registerPush(context, BuildConfig.XIAOMI_APP_ID, BuildConfig.XIAOMI_APP_KEY);
+        } else if (isSupport(PushType.Huawei)) {
+            HmsMessaging.getInstance(context).turnOnPush();
+            HmsMessaging.getInstance(context).setAutoInitEnabled(true);
+            HmsMessaging.getInstance(context).setAutoInitEnabled(false);
         } else if (isSupport(PushType.Oppo)) {
             HeytapPushManager.init(context, false);
             HeytapPushManager.register(context, BuildConfig.OPPO_APP_KEY, BuildConfig.OPPO_APP_SECRET, new ICallBackResultService() {
@@ -101,49 +102,29 @@ public class PushKit {
                 }
             });
         } else if (isSupport(PushType.ViVo)) {
-            //初始化push
-            try {
-//PushConfig.agreePrivacyStatement属性及含义说明请参考接口文档
-//使用方法
-                PushConfig config = new PushConfig.Builder()
-                        .agreePrivacyStatement(true)
-                        .build();
-                PushClient.getInstance(context).initialize(config);
-                PushClient.getInstance(context).turnOnPush(state -> {
+            PushClient.getInstance(context).turnOnPush(state -> {
 
-                    if (state == 0) {
-                        PushClient.getInstance(context).getRegId(new IPushQueryActionListener() {
-                            @Override
-                            public void onSuccess(String s) {
-                                onToken(PushType.ViVo, s);
-                            }
+                if (state == 0) {
+                    PushClient.getInstance(context).getRegId(new IPushQueryActionListener() {
+                        @Override
+                        public void onSuccess(String s) {
+                            onToken(PushType.ViVo, s);
+                        }
 
-                            @Override
-                            public void onFail(Integer integer) {
+                        @Override
+                        public void onFail(Integer integer) {
 
-                            }
-                        });
-                    }
+                        }
+                    });
+                }
 
-                });
-            } catch (VivoPushException e) {
-//此处异常说明是有必须的vpush配置未配置所致，需要仔细检查集成指南的各项配置。
-                e.printStackTrace();
-            }
-        } else if (isSupport(PushType.Huawei)) {
-            HmsMessaging.getInstance(context).turnOnPush();
-            HmsMessaging.getInstance(context).setAutoInitEnabled(true);
-            HmsMessaging.getInstance(context).setAutoInitEnabled(false);
-
+            });
         }
-
-
         if (this.cachedMessage != null && this.cachedPushType != null) {
             onMessageClick(cachedPushType, cachedMessage);
             this.cachedMessage = null;
             this.cachedPushType = null;
         }
-
     }
 
 
@@ -153,35 +134,28 @@ public class PushKit {
         this.cachedPushType = null;
         if (isSupport(PushType.XiaoMi)) {
             MiPushClient.unregisterPush(context);
+        } else if (isSupport(PushType.Huawei)) {
+            HmsMessaging.getInstance(context).turnOffPush();
         } else if (isSupport(PushType.Oppo)) {
             HeytapPushManager.unRegister();
         } else if (isSupport(PushType.ViVo)) {
-            PushConfig config = new PushConfig.Builder()
-                    .agreePrivacyStatement(true)
-                    .build();
-            try {
-                PushClient.getInstance(context).initialize(config);
-                PushClient.getInstance(context).turnOffPush(new IPushActionListener() {
-                    @Override
-                    public void onStateChanged(int i) {
+            PushClient.getInstance(context).turnOffPush(new IPushActionListener() {
+                @Override
+                public void onStateChanged(int i) {
 
-                    }
-                });
-            } catch (VivoPushException e) {
-                throw new RuntimeException(e);
-            }
-        } else if (isSupport(PushType.Huawei)) {
-            HmsMessaging.getInstance(context).turnOffPush();
+                }
+            });
+
         }
     }
 
 
     private boolean isSupport(PushType pushType) {
         if (pushType == PushType.XiaoMi) {
-            return !BuildConfig.XIAOMI_APP_ID.isEmpty() && !BuildConfig.XIAOMI_APP_KEY.isEmpty() && RomUtil.isXiaomi();
+            return !BuildConfig.XIAOMI_APP_ID.isEmpty() && !BuildConfig.XIAOMI_APP_KEY.isEmpty() && RomUtil.isXiaoMi();
         }
         if (pushType == PushType.Huawei) {
-            return BuildConfig.HUAWEI_AGC_SERVICE_EXIST && RomUtil.isHuawei();
+            return BuildConfig.HUAWEI_AGC_SERVICE_EXIST && RomUtil.isHuaWei();
         }
         if (pushType == PushType.Oppo) {
             ///目前支持 ColorOS3.1及以上的系统的OPPO的机型，一加5/5t及以上机型，realme所有机型。
@@ -189,7 +163,17 @@ public class PushKit {
             return !BuildConfig.OPPO_APP_KEY.isEmpty() && !BuildConfig.OPPO_APP_SECRET.isEmpty() && HeytapPushManager.isSupportPush(context);
         }
         if (pushType == PushType.ViVo) {
-            return !BuildConfig.VIVO_APP_ID.isEmpty() && !BuildConfig.VIVO_APP_KEY.isEmpty() && RomUtil.isVivo();
+            ///目前支持 vivo iqoo
+            ///所以不要用rom来判断
+            try {
+                PushConfig config = new PushConfig.Builder()
+                        .agreePrivacyStatement(true)
+                        .build();
+                PushClient.getInstance(context).initialize(config);
+            } catch (VivoPushException e) {
+                e.printStackTrace();
+            }
+            return !BuildConfig.VIVO_APP_ID.isEmpty() && !BuildConfig.VIVO_APP_KEY.isEmpty() && PushClient.getInstance(context).isSupport();
         }
 
         return false;
@@ -220,22 +204,14 @@ public class PushKit {
     public void handleIntent(Intent intent) {
         Bundle bundleExtras = intent.getExtras();
         if (bundleExtras != null) {
-            if (isSupport(PushType.XiaoMi) && bundleExtras.containsKey(PushMessageHelper.KEY_MESSAGE)) {
+            if (bundleExtras.containsKey(PushMessageHelper.KEY_MESSAGE) && isSupport(PushType.XiaoMi)) {
                 ///小米推送
                 MiPushMessage miPushMessage = (MiPushMessage) intent.getSerializableExtra(PushMessageHelper.KEY_MESSAGE);
                 if (miPushMessage != null) {
                     Map<String, Object> message = MapUtils.toMap(BundleUtils.convertJSONObject(miPushMessage.toBundle()));
                     PushKit.instance.onMessageClick(PushType.XiaoMi, message);
                 }
-            } else if (isSupport(PushType.Oppo)) {
-                ///oppo
-                Map<String, Object> message = MapUtils.toMap(BundleUtils.convertJSONObject(bundleExtras));
-                PushKit.instance.onMessageClick(PushType.ViVo, message);
-            } else if (isSupport(PushType.ViVo) && bundleExtras.containsKey("vivo_push_messageId")) {
-                ///vivo
-                Map<String, Object> message = MapUtils.toMap(BundleUtils.convertJSONObject(bundleExtras));
-                PushKit.instance.onMessageClick(PushType.ViVo, message);
-            } else if (isSupport(PushType.Huawei) && bundleExtras.containsKey("_hw_from")) {
+            } else if (bundleExtras.containsKey("_hw_from") && isSupport(PushType.Huawei)) {
                 ///华为
                 Map<String, Object> message = new HashMap<>();
                 message.put("uriPage", intent.getDataString());
@@ -244,6 +220,14 @@ public class PushKit {
                 Map<String, Object> extras = MapUtils.toMap(BundleUtils.convertJSONObject(bundleExtras));
                 message.put("extras", extras);
                 PushKit.instance.onMessageClick(PushType.Huawei, message);
+            } else if (bundleExtras.containsKey("vivo_push_messageId") && isSupport(PushType.ViVo)) {
+                ///vivo
+                Map<String, Object> message = MapUtils.toMap(BundleUtils.convertJSONObject(bundleExtras));
+                PushKit.instance.onMessageClick(PushType.ViVo, message);
+            } else if (isSupport(PushType.Oppo)) {
+                ///oppo
+                Map<String, Object> message = MapUtils.toMap(BundleUtils.convertJSONObject(bundleExtras));
+                PushKit.instance.onMessageClick(PushType.ViVo, message);
             }
         }
     }

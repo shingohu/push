@@ -56,7 +56,8 @@ class _MyAppState extends State<MyApp> {
                           pushMessage = message.toString();
                           setState(() {});
                         }, onToken: (pushType, token) {
-                          print(pushType.name + " token->" + token);
+                          pushMessage = token;
+                          setState(() {});
                         });
                       },
                       child: Text(
