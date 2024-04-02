@@ -1,0 +1,26 @@
+支持APNS XiaoMi ViVo Oppo Huawei  推送
+插件内部会自动判断当前设备所属推送类别进行自动注册
+集成此推送插件需要完成一下几个步骤
+在主工程跟目录下创建push.properties文件配置 xiaomi vivo oppo appId appKey等参数,具体参考demo
+华为推送需要添加agconnect-services.json 到主工程app目录下面
+主工程build.gradle repositories(buildscript和allprojects)中添加  maven {url 'https://developer.huawei.com/repo/'}
+主工程build.gradle dependencies中添加  classpath 'com.huawei.agconnect:agcp:1.6.0.300'
+app目录里面的build.gradle 添加 apply plugin: 'com.huawei.agconnect'
+
+
+FCM推送需要添加google-services.json 到主工程app目录下面
+主工程build.gradle dependencies中添加  classpath 'com.google.gms:google-services:4.3.10'
+app目录里面的build.gradle 添加 apply plugin: 'com.google.gms.google-services'
+
+
+
+
+### 由于Flutter App一般是单AC的应用,而点击通知消息后需要触达到各个业务页面中去,在原生中可以在Manifest中进行配置对应的AC,但是flutter中无法完成这一点
+所以我们需要对点击通知进行拦击处理,获取到消息后传递给flutter的业务端,让业务端自己处理。问题的难点就在此
+每家对于消息的点击处理都不一样,没办法统一处理,只能一个个跟后端对好数据,然后前端来一个个适配
+小米:如果是自定义消息,提供了点击消息的回调,插件内部进行处理(已完成)
+firebase目前没有办法自己处理,只能通过启动页面的intent进行处理,但是集成方无法保证启动页面就是FlutterActivity,如果不是,需要将消息传递到FlutterActivity
+oppo: 定义了点击消息动作类型 0，启动应用；1，打开应用内页（activity的intent action）；2，打开网页；4，打开应用内页（activity）；【非必填，默认值为0】;5,Intent scheme URL
+但是 如果是0 启动应用时,无法携带数据(Oppo后端API没有提供),目前可以考虑使用4或者5来实现(参考https://open.oppomobile.com/wiki/doc#id=10200)
+华为:定义了点击消息动作类型 打开应用首页、打开网页、打开应用自定义页面,可以考虑使用打开应用自定义页面实现,参考https://developer.huawei.com/consumer/cn/doc/development/HMSCore-Guides/andorid-basic-clickaction-0000001087554076
+vivo:定义了点击消息动作类型，当点击通知时，打开通知动作分为打开App首页、打开特定Uri 网址页面、 打开用户自定义、打开应用指定页面。参考https://dev.vivo.com.cn/documentCenter/doc/365#w1-93576516

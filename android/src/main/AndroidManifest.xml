@@ -1,0 +1,104 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.lianke.push">
+
+    <!--    android 13 默认关闭了通知,需要请求通知权限-->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <queries>
+        <intent>
+            <action android:name="com.huawei.hms.core.aidlservice" />
+        </intent>
+    </queries>
+
+    <application>
+
+
+        <!--        小米推送-->
+        <receiver
+            android:name="com.lianke.push.xiaomi.XiaoMiPushMessageReceiver"
+            android:exported="true">
+            <!--这里com.xiaomi.mipushdemo.DemoMessageRreceiver改成app中定义的完整类名-->
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.RECEIVE_MESSAGE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.MESSAGE_ARRIVED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.ERROR" />
+            </intent-filter>
+        </receiver>
+
+
+        <!--        oppo 推送-->
+
+        <!--        兼容Q版本，继承DataMessageCallbackService-->
+        <service
+            android:name=".oppo.OppoPushMessageAboveQService"
+            android:exported="false"
+            android:permission="com.heytap.mcs.permission.RECIEVE_PUSH_MESSAGE">
+            <intent-filter>
+                <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE" />
+                <action android:name="com.heytap.msp.push.RECEIVE_MCS_MESSAGE" />
+            </intent-filter>
+        </service>
+
+
+        <!--        （兼容Q以下版本，继承CompatibleDataMessageCallbackService）-->
+
+        <service
+            android:name=".oppo.OppoPushMessageBelowQService"
+            android:exported="false"
+            android:permission="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE">
+            <intent-filter>
+                <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE" />
+            </intent-filter>
+        </service>
+
+
+        <!--        vivo push-->
+        <!--Push开放平台中应用的appid 和api key-->
+        <meta-data
+            android:name="api_key"
+            android:value="@string/vivo_app_key" />
+
+        <meta-data
+            android:name="app_id"
+            android:value="@string/vivo_app_id" />
+        <!--push应用定义消息receiver声明-->
+        <receiver
+            android:name=".vivo.VivoPushMessageReceiver"
+            android:exported="false">
+            <intent-filter>
+                <!--接收push消息-->
+                <action android:name="com.vivo.pushclient.action.RECEIVE" />
+            </intent-filter>
+        </receiver>
+        <!--Push需要配置的service、activity-->
+        <service
+            android:name="com.vivo.push.sdk.service.CommandClientService"
+            android:exported="true"
+            android:permission="com.push.permission.UPSTAGESERVICE" />
+
+
+        <!--        huawei push-->
+
+
+        <service
+            android:name=".huawei.HuaweiPushMessageService"
+            android:directBootAware="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="push_kit_auto_init_enabled"
+            android:value="false" />
+
+    </application>
+
+
+</manifest>

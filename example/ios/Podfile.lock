@@ -1,0 +1,51 @@
+PODS:
+  - AGConnectCore (1.9.0.302):
+    - HMFoundation (~> 1.4)
+  - AGConnectCredential (1.9.0.302):
+    - AGConnectCore (~> 1.4)
+  - device_info_plus (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - HiAnalytics (6.10.0.311):
+    - AGConnectCredential
+  - HMFoundation (1.9.0.302)
+  - HmsPushSDK (5.0.5.309):
+    - HiAnalytics
+  - push (0.0.1):
+    - Flutter
+    - HmsPushSDK
+
+DEPENDENCIES:
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
+  - Flutter (from `Flutter`)
+  - push (from `.symlinks/plugins/push/ios`)
+
+SPEC REPOS:
+  trunk:
+    - AGConnectCore
+    - AGConnectCredential
+    - HiAnalytics
+    - HMFoundation
+    - HmsPushSDK
+
+EXTERNAL SOURCES:
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
+  Flutter:
+    :path: Flutter
+  push:
+    :path: ".symlinks/plugins/push/ios"
+
+SPEC CHECKSUMS:
+  AGConnectCore: 8080cbbee27357ab3d9d97b13d5e3be117eeba35
+  AGConnectCredential: 962f8a4abc33f3ae7b69bcf00f709b2a74096a1d
+  device_info_plus: 7545d84d8d1b896cb16a4ff98c19f07ec4b298ea
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  HiAnalytics: 07a774c560885f699db1d25af9e0cfc3fcf315e3
+  HMFoundation: 07a5cc092dc728e13400df5d24648f03ded00a95
+  HmsPushSDK: 5557607599cb37f7dd9528c17c97def4e63f544d
+  push: 50b1aab4a7387662f5e1601cd611fd1762e7632f
+
+PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
+
+COCOAPODS: 1.15.2

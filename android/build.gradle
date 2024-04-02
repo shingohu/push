@@ -1,0 +1,276 @@
+def localProperties = new Properties()
+def pushProperties = rootProject.file('push.properties')
+if (pushProperties.exists()) {
+    pushProperties.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+} else {
+    throw new GradleException("push.properties not found. push sdk will not work")
+}
+
+
+def XIAOMI_APP_ID = localProperties.getProperty('XIAOMI_APP_ID')
+def XIAOMI_APP_KEY = localProperties.getProperty('XIAOMI_APP_KEY')
+if (XIAOMI_APP_ID == null) {
+    XIAOMI_APP_ID = ""
+}
+if (XIAOMI_APP_KEY == null) {
+    XIAOMI_APP_KEY = ""
+}
+
+def VIVO_APP_ID = localProperties.getProperty('VIVO_APP_ID')
+def VIVO_APP_KEY = localProperties.getProperty('VIVO_APP_KEY')
+
+if (VIVO_APP_ID == null) {
+    VIVO_APP_ID = ""
+}
+if (VIVO_APP_KEY == null) {
+    VIVO_APP_KEY = ""
+}
+
+def OPPO_APP_SECRET = localProperties.getProperty('OPPO_APP_SECRET')
+def OPPO_APP_KEY = localProperties.getProperty('OPPO_APP_KEY')
+
+
+if (OPPO_APP_SECRET == null) {
+    OPPO_APP_SECRET = ""
+}
+if (OPPO_APP_KEY == null) {
+    OPPO_APP_KEY = ""
+}
+
+
+def HUAWEI_AGC_SERVICE_EXIST = rootProject.file('app/agconnect-services.json').exists()
+
+
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+
+group 'com.lianke.push.push'
+version '1.0'
+
+// Add this
+String localMavenPath = project.mkdir("build").absolutePath
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://developer.huawei.com/repo/" }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.0'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            // [必需] aar 插件
+            url "${project(':push').projectDir}/build"
+        }
+        maven { url "https://developer.huawei.com/repo/" }
+    }
+}
+
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdk 34
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        minSdkVersion 21
+        buildTypes {
+            release {
+                consumerProguardFiles 'consumer-rules.pro'
+            }
+            debug {
+                consumerProguardFiles 'consumer-rules.pro'
+            }
+        }
+        buildConfigField('String', 'XIAOMI_APP_ID', XIAOMI_APP_ID)
+        buildConfigField('String', 'XIAOMI_APP_KEY', XIAOMI_APP_KEY)
+        buildConfigField('String', 'VIVO_APP_ID', VIVO_APP_ID)
+        buildConfigField('String', 'VIVO_APP_KEY', VIVO_APP_KEY)
+        buildConfigField('String', 'OPPO_APP_SECRET', OPPO_APP_SECRET)
+        buildConfigField('String', 'OPPO_APP_KEY', OPPO_APP_KEY)
+        buildConfigField('boolean', 'HUAWEI_AGC_SERVICE_EXIST', HUAWEI_AGC_SERVICE_EXIST.toString())
+        resValue 'string', 'vivo_app_id', VIVO_APP_ID
+        resValue 'string', 'vivo_app_key', VIVO_APP_KEY
+    }
+    dependencies {
+        //OPPO 以下依赖都需要添加
+        implementation 'com.google.code.gson:gson:2.10.1'
+        implementation 'commons-codec:commons-codec:1.11'
+        implementation 'androidx.annotation:annotation:1.7.1'
+
+        implementation 'com.huawei.hms:push:6.12.0.300'
+    }
+
+
+}
+
+
+String aarPath = localMavenPath
+task useAar {
+    File file = project.file("libs")
+    if (file.exists() && file.isDirectory()) {
+        file.listFiles(new FileFilter() {
+            @Override
+            boolean accept(File pathname) {
+                return pathname.name.endsWith(".aar")
+            }
+        }).each { item ->
+            String aarName = item.name.substring(0, item.name.length() - 4)
+            String[] aarInfo = aarName.split("-")
+            String sha1 = getFileSha1(item)
+            String md5 = getFileMD5(item)
+            String fromStr = item.path
+            String intoStr = aarPath + "/" + aarInfo[0].replace(".", "/") + "/" + aarInfo[1] + "/" + aarInfo[2]
+            String newName = aarInfo[1] + "-" + aarInfo[2] + ".aar"
+            println("localMavenPath: " + localMavenPath)
+            println("aar: " + aarInfo + " file sha1:" + sha1 + " md5:" + md5)
+            println("aarPath: " + aarPath)
+            println("intoStr: " + intoStr)
+            println("newName: " + newName)
+            println("fromStr: " + fromStr)
+            println("intoStr: " + intoStr)
+
+            project.copy {
+                from fromStr
+                into intoStr
+                rename(item.name, newName)
+            }
+
+            project.file(intoStr + "/" + newName + ".md5").write(md5)
+            project.file(intoStr + "/" + newName + ".sha1").write(sha1)
+
+            String pomPath = intoStr + "/" + newName.substring(0, newName.length() - 4) + ".pom"
+            project.file(pomPath).write(createPomStr(aarInfo[0], aarInfo[1], aarInfo[2]))
+            project.file(pomPath + ".md5").write(getFileMD5(project.file(pomPath)))
+            project.file(pomPath + ".sha1").write(getFileSha1(project.file(pomPath)))
+
+            String metadataPath = project.file(intoStr).getParentFile().path + "/maven-metadata.xml"
+            project.file(metadataPath).write(createMetadataStr(aarInfo[0], aarInfo[1], aarInfo[2]))
+            project.file(metadataPath + ".md5").write(getFileMD5(project.file(metadataPath)))
+            project.file(metadataPath + ".sha1").write(getFileSha1(project.file(metadataPath)))
+            dependencies {
+                implementation "${aarInfo[0]}:${aarInfo[1]}:${aarInfo[2]}"
+            }
+        }
+    }
+}
+
+public static String createMetadataStr(String groupId, String artifactId, String version) {
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<metadata>\n" +
+            "  <groupId>$groupId</groupId>\n" +
+            "  <artifactId>$artifactId</artifactId>\n" +
+            "  <versioning>\n" +
+            "    <release>$version</release>\n" +
+            "    <versions>\n" +
+            "      <version>$version</version>\n" +
+            "    </versions>\n" +
+            "    <lastUpdated>${new Date().format('yyyyMMdd')}000000</lastUpdated>\n" +
+            "  </versioning>\n" +
+            "</metadata>\n"
+}
+
+public static String createPomStr(String groupId, String artifactId, String version) {
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<project xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\" xmlns=\"http://maven.apache.org/POM/4.0.0\"\n" +
+            "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+            "  <modelVersion>4.0.0</modelVersion>\n" +
+            "  <groupId>$groupId</groupId>\n" +
+            "  <artifactId>$artifactId</artifactId>\n" +
+            "  <version>$version</version>\n" +
+            "  <packaging>aar</packaging>\n" +
+            "</project>\n"
+}
+
+public static String getFileSha1(File file) {
+    FileInputStream input = null;
+    try {
+        input = new FileInputStream(file);
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        byte[] buffer = new byte[1024 * 1024 * 10];
+
+        int len = 0;
+        while ((len = input.read(buffer)) > 0) {
+            digest.update(buffer, 0, len);
+        }
+        String sha1 = new BigInteger(1, digest.digest()).toString(16);
+        int length = 40 - sha1.length();
+        if (length > 0) {
+            for (int i = 0; i < length; i++) {
+                sha1 = "0" + sha1;
+            }
+        }
+        return sha1;
+    }
+    catch (IOException e) {
+        System.out.println(e);
+    }
+    catch (NoSuchAlgorithmException e) {
+        System.out.println(e);
+    }
+    finally {
+        try {
+            if (input != null) {
+                input.close();
+            }
+        }
+        catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+}
+
+public static String getFileMD5(File file) {
+    FileInputStream input = null;
+    try {
+        input = new FileInputStream(file);
+        MessageDigest digest = MessageDigest.getInstance("MD5");
+        byte[] buffer = new byte[1024 * 1024 * 10];
+
+        int len = 0;
+        while ((len = input.read(buffer)) > 0) {
+            digest.update(buffer, 0, len);
+        }
+        String md5 = new BigInteger(1, digest.digest()).toString(16);
+        int length = 32 - md5.length();
+        if (length > 0) {
+            for (int i = 0; i < length; i++) {
+                md5 = "0" + md5;
+            }
+        }
+        return md5;
+    }
+    catch (IOException e) {
+        System.out.println(e);
+    }
+    catch (NoSuchAlgorithmException e) {
+        System.out.println(e);
+    }
+    finally {
+        try {
+            if (input != null) {
+                input.close();
+            }
+        }
+        catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+}
+
+
