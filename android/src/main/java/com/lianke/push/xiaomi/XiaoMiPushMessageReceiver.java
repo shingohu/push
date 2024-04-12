@@ -25,7 +25,6 @@ public class XiaoMiPushMessageReceiver extends PushMessageReceiver {
 
     @Override
     public void onNotificationMessageArrived(Context context, MiPushMessage miPushMessage) {
-        Log.e("PUSH", "onNotificationMessageArrived");
     }
 
 
@@ -34,7 +33,6 @@ public class XiaoMiPushMessageReceiver extends PushMessageReceiver {
 //    注意：用户点击了预定义通知消息，消息不会通过onNotificationMessageClicked方法传到客户端。
     @Override
     public void onNotificationMessageClicked(Context context, MiPushMessage miPushMessage) {
-        Log.e("PUSH", "onNotificationMessageClicked");
         try {
             Intent intent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
             if (intent != null) {
