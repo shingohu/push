@@ -137,13 +137,13 @@ task useAar {
             String fromStr = item.path
             String intoStr = aarPath + "/" + aarInfo[0].replace(".", "/") + "/" + aarInfo[1] + "/" + aarInfo[2]
             String newName = aarInfo[1] + "-" + aarInfo[2] + ".aar"
-            println("localMavenPath: " + localMavenPath)
-            println("aar: " + aarInfo + " file sha1:" + sha1 + " md5:" + md5)
-            println("aarPath: " + aarPath)
-            println("intoStr: " + intoStr)
-            println("newName: " + newName)
-            println("fromStr: " + fromStr)
-            println("intoStr: " + intoStr)
+//            println("localMavenPath: " + localMavenPath)
+//            println("aar: " + aarInfo + " file sha1:" + sha1 + " md5:" + md5)
+//            println("aarPath: " + aarPath)
+//            println("intoStr: " + intoStr)
+//            println("newName: " + newName)
+//            println("fromStr: " + fromStr)
+//            println("intoStr: " + intoStr)
 
             project.copy {
                 from fromStr
