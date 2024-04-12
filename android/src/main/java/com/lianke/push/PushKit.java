@@ -70,7 +70,6 @@ public class PushKit {
                  */
                 @Override
                 public void onRegister(int responseCode, String registerID, String packageName, String miniPackageName) {
-                    Log.e(TAG, "oppo onRegister" + "OPPO PUSH onRegister->" + responseCode + "," + registerID + "," + packageName + "," + miniPackageName);
                     if (responseCode == 0) {
                         onToken(PushType.Oppo, registerID);
                     }
@@ -98,7 +97,7 @@ public class PushKit {
 
                 @Override
                 public void onError(int i, String s, String s1, String s2) {
-                    Log.e(TAG, "oppo onRegister" + "失败->" + i + "," + s + "," + s1 + "," + s2);
+
                 }
             });
         } else if (isSupport(PushType.ViVo)) {
