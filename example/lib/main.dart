@@ -56,6 +56,7 @@ class _MyAppState extends State<MyApp> {
                           pushMessage = message.toString();
                           setState(() {});
                         }, onToken: (pushType, token) {
+                          print("token: $token");
                           pushMessage = token;
                           setState(() {});
                         });
@@ -67,6 +68,8 @@ class _MyAppState extends State<MyApp> {
                   TextButton(
                       onPressed: () {
                         pushConnector.unregister();
+                        pushMessage = "";
+                        setState(() {});
                       },
                       child: Text(
                         "取消注册",

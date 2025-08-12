@@ -81,7 +81,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdk 34
-
+    namespace "com.lianke.push"
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -106,6 +106,9 @@ android {
         buildConfigField('boolean', 'HUAWEI_AGC_SERVICE_EXIST', HUAWEI_AGC_SERVICE_EXIST.toString())
         resValue 'string', 'vivo_app_id', VIVO_APP_ID
         resValue 'string', 'vivo_app_key', VIVO_APP_KEY
+    }
+    buildFeatures {
+        buildConfig true  // 确保这一行存在且为 true
     }
     dependencies {
         //OPPO 以下依赖都需要添加
