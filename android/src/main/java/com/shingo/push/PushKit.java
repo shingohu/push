@@ -65,12 +65,12 @@ public class PushKit {
 
     public void register(PushListener pushListener) {
         this.listener = pushListener;
-        if (isSupport(PushType.XiaoMi) && shouldInit(context)) {
-            MiPushClient.registerPush(context, BuildConfig.XIAOMI_APP_ID, BuildConfig.XIAOMI_APP_KEY);
-        } else if (isSupport(PushType.Huawei)) {
+        if (isSupport(PushType.Huawei)) {
             HmsMessaging.getInstance(context).turnOnPush();
             HmsMessaging.getInstance(context).setAutoInitEnabled(true);
             HmsMessaging.getInstance(context).setAutoInitEnabled(false);
+        } else if (isSupport(PushType.XiaoMi) && shouldInit(context)) {
+            MiPushClient.registerPush(context, BuildConfig.XIAOMI_APP_ID, BuildConfig.XIAOMI_APP_KEY);
         } else if (isSupport(PushType.Oppo)) {
             HeytapPushManager.init(context, false);
             HeytapPushManager.register(context, BuildConfig.OPPO_APP_KEY, BuildConfig.OPPO_APP_SECRET, new ICallBackResultService() {
