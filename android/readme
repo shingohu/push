@@ -1,19 +1,21 @@
-支持APNS XiaoMi ViVo Oppo Huawei  推送
+支持APNS FCM XiaoMi ViVo Oppo Huawei 推送
 插件内部会自动判断当前设备所属推送类别进行自动注册
 集成此推送插件需要完成一下几个步骤
 在主工程跟目录下创建push.properties文件配置 xiaomi vivo oppo appId appKey等参数,具体参考demo
+
 华为推送需要添加agconnect-services.json 到主工程app目录下面
 主工程build.gradle repositories(buildscript和allprojects)中添加  maven {url 'https://developer.huawei.com/repo/'}
 主工程build.gradle dependencies中添加  classpath 'com.huawei.agconnect:agcp:1.6.0.300'
 app目录里面的build.gradle 添加 apply plugin: 'com.huawei.agconnect'
 
 
-FCM推送需要添加google-services.json 到主工程app目录下面
+FCM推送需要添加google-services.json 到主工程app目录下面,参开https://firebase.google.cn/docs/cloud-messaging/android/first-message?hl=el
 主工程build.gradle dependencies中添加  classpath 'com.google.gms:google-services:4.3.10'
 app目录里面的build.gradle 添加 apply plugin: 'com.google.gms.google-services'
 
+FCM优先支持,比如小米国际版,虽然也能命中支持,但是可能获取不到Token,这时候如果支持FCM会返回FCM的Token
 
-
+当前只支持通知栏消息,不支持透传消息
 
 ### 由于Flutter App一般是单AC的应用,而点击通知消息后需要触达到各个业务页面中去,在原生中可以在Manifest中进行配置对应的AC,但是flutter中无法完成这一点
 所以我们需要对点击通知进行拦击处理,获取到消息后传递给flutter的业务端,让业务端自己处理。问题的难点就在此

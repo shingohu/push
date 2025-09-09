@@ -5,18 +5,17 @@
 Pod::Spec.new do |s|
   s.name             = 'push'
   s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.summary          = 'Native Push Plugin.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+Native Push Plugin.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/shingohu'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Your Company' => 'shingohu@163.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.platform = :ios, '11.0'
-  s.dependency 'HmsPushSDK'
+  s.platform = :ios, '10.0'
   s.static_framework = true
   s.libraries = 'c++'
   # Flutter.framework does not contain a i386 slice.

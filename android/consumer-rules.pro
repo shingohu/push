@@ -35,7 +35,7 @@
 -keep class com.huawei.hms.**{*;}
 
 
--keep class com.lianke.push.**{
+-keep class com.shingo.push.**{
 *;
 }
 

@@ -1,16 +1,17 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'push_types.dart';
 
 ///启动消息的回调
-typedef void PushMessageHandler(
-    PushType pushType, Map<dynamic, dynamic> message);
+typedef void PushMessageHandler(PushType pushType, Map<dynamic, dynamic> message);
 
 ///处理token的回调
 typedef void PushTokenHandler(PushType pushType, String token);
 
-const String _channelName = 'com.lianke.push';
+const String _channelName = 'com.shingo.push';
 
 /// 推送接口，实现常见功能.
 class PushConnector {
@@ -31,9 +32,7 @@ class PushConnector {
   PushConnector._() {}
 
   ///注册
-  Future<void> register(
-      {required PushMessageHandler onLaunch,
-      required PushTokenHandler onToken}) async {
+  Future<void> register({required PushMessageHandler onLaunch, required PushTokenHandler onToken}) async {
     _onLaunch = onLaunch;
     _onToken = onToken;
     _channel.setMethodCallHandler(_handleMethod);
@@ -63,7 +62,7 @@ class PushConnector {
 
   ///取消注册
   Future<void> unregister() async {
-    clearAll();
+    await clearAll();
     await _channel.invokeMethod('unregister');
     _onLaunch = null;
     _onToken = null;
@@ -84,7 +83,7 @@ class PushConnector {
 
   ///清除所有通知
   Future<void> clearAll() async {
-    _channel.invokeMethod("clearAll");
+    return _channel.invokeMethod("clearAll");
   }
 
   ///检查是否授权(android13 以及iOS未请求权限之前都是false)

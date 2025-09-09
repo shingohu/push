@@ -11,7 +11,7 @@
 @implementation FlutterApnsSerialization
 
 + (NSDictionary *)remoteMessageUserInfoToDict:(NSDictionary *)userInfo {
-    ///这里不处理了,服务端推什么过来直接返回给业务方,有业务方自己处理
+    ///这里不处理了,服务端推什么过来直接返回给业务方,业务方自己处理
     return userInfo;
 }
 

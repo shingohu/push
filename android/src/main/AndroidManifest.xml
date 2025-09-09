@@ -13,9 +13,9 @@
     <application>
 
 
-        <!--        小米推送-->
+        <!--小米推送-->
         <receiver
-            android:name="com.lianke.push.xiaomi.XiaoMiPushMessageReceiver"
+            android:name=".xiaomi.XiaoMiPushMessageReceiver"
             android:exported="true">
             <!--这里com.xiaomi.mipushdemo.DemoMessageRreceiver改成app中定义的完整类名-->
             <intent-filter>
@@ -30,13 +30,13 @@
         </receiver>
 
 
-        <!--        oppo 推送-->
+        <!--oppo 推送-->
 
-        <!--        兼容Q版本，继承DataMessageCallbackService-->
+        <!--兼容Q版本，继承DataMessageCallbackService-->
         <service
             android:name=".oppo.OppoPushMessageAboveQService"
-            android:exported="false"
-            android:permission="com.heytap.mcs.permission.RECIEVE_PUSH_MESSAGE">
+            android:exported="true"
+            android:permission="com.heytap.mcs.permission.SEND_PUSH_MESSAGE">
             <intent-filter>
                 <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE" />
                 <action android:name="com.heytap.msp.push.RECEIVE_MCS_MESSAGE" />
@@ -44,19 +44,19 @@
         </service>
 
 
-        <!--        （兼容Q以下版本，继承CompatibleDataMessageCallbackService）-->
+        <!--（兼容Q以下版本，继承CompatibleDataMessageCallbackService）-->
 
         <service
             android:name=".oppo.OppoPushMessageBelowQService"
-            android:exported="false"
-            android:permission="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE">
+            android:exported="true"
+            android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
             <intent-filter>
                 <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE" />
             </intent-filter>
         </service>
 
 
-        <!--        vivo push-->
+        <!--vivo push-->
         <!--Push开放平台中应用的appid 和api key-->
         <meta-data
             android:name="api_key"
@@ -68,7 +68,7 @@
         <!--push应用定义消息receiver声明-->
         <receiver
             android:name=".vivo.VivoPushMessageReceiver"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <!--接收push消息-->
                 <action android:name="com.vivo.pushclient.action.RECEIVE" />
@@ -81,20 +81,37 @@
             android:permission="com.push.permission.UPSTAGESERVICE" />
 
 
-        <!--        huawei push-->
+        <!-- huawei push-->
 
 
         <service
             android:name=".huawei.HuaweiPushMessageService"
             android:directBootAware="true"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
+<!--    https://developer.huawei.com/consumer/cn/doc/HMSCore-Guides/android-client-dev-0000001050042041#section13546121751811    -->
         <meta-data
             android:name="push_kit_auto_init_enabled"
+            android:value="false" />
+
+        <!-- fcm push-->
+        <service
+            android:name=".fcm.FCMMessagingService"
+            android:directBootAware="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+<!--        https://firebase.google.com/docs/reference/android/com/google/firebase/messaging/FirebaseMessaging#setAutoInitEnabled(boolean)-->
+        <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
             android:value="false" />
 
     </application>

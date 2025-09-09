@@ -1,7 +1,7 @@
 name: push
-description: A new Flutter plugin project.
+description: Native Push Plugin
 version: 0.0.1
-homepage:
+homepage: https://github.com/shingohu
 
 environment:
   sdk: '>=3.0.3 <4.0.0'
@@ -10,11 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-
-
-dev_dependencies:
-
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -34,7 +29,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.lianke.push
+        package: com.shingo.push
         pluginClass: PushPlugin
       ios:
         pluginClass: PushPlugin

@@ -1,6 +1,5 @@
 import Flutter
 import UserNotifications
-import HmsPushSdk
 
 
 
@@ -15,7 +14,7 @@ func getFlutterError(_ error: Error) -> FlutterError {
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "com.lianke.push", binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(name: "com.shingo.push", binaryMessenger: registrar.messenger())
         let instance = PushPlugin(channel: channel)
         registrar.addApplicationDelegate(instance)
         registrar.addMethodCallDelegate(instance, channel: channel)
@@ -171,16 +170,9 @@ func getFlutterError(_ error: Error) -> FlutterError {
                deviceTokenString = deviceTokenString1;
            } else {
                deviceTokenString = deviceToken.reduce("", { $0 + String(format: "%02X", $1) })
-            
            }
-        
-        
-        /// covert to huawei push
-        
-        var huaweitoken = HmsInstanceId.getInstance().getToken(deviceTokenString)
-        
         channel.invokeMethod("onToken", arguments: [
-            "token":huaweitoken,
+            "token":deviceTokenString,
             "type":"APNS"
         ])
     }

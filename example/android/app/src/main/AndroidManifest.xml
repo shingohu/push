@@ -2,11 +2,11 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="push_example"
+        android:label="推送demo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
-            android:name="com.lianke.push.push_example.MainActivity"
+            android:name="com.shingo.push.demo.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"

@@ -16,7 +16,7 @@ class _MyAppState extends State<MyApp> {
   PushConnector pushConnector = PushConnector();
 
   String pushMessage = "";
-  int i = 0;
+  String pushToken = "";
 
   @override
   void initState() {
@@ -29,55 +29,61 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('PUSH DEMO'),
+          title: const Text('推送demo'),
           centerTitle: true,
         ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              i.toString(),
-              style: TextStyle(color: Colors.black, fontSize: 16),
-            ),
-            SizedBox(height: 20),
-            Text(
-              pushMessage,
-              style: TextStyle(color: Colors.black, fontSize: 16),
-            ),
-            SizedBox(height: 20),
-            Center(
-              child: Column(
-                children: [
-                  TextButton(
-                      onPressed: () {
-                        pushConnector.register(onLaunch: (pushType, message) {
-                          i++;
-                          pushMessage = message.toString();
-                          setState(() {});
-                        }, onToken: (pushType, token) {
-                          print("token: $token");
-                          pushMessage = token;
-                          setState(() {});
-                        });
-                      },
-                      child: Text(
-                        "注册",
-                        style: TextStyle(fontSize: 18),
-                      )),
-                  TextButton(
-                      onPressed: () {
-                        pushConnector.unregister();
-                        pushMessage = "";
-                        setState(() {});
-                      },
-                      child: Text(
-                        "取消注册",
-                        style: TextStyle(fontSize: 18),
-                      )),
-                ],
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Container(
+                width: double.infinity,
+                child: SelectableText(
+                  pushToken,
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                ),
               ),
-            )
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SingleChildScrollView(
+                child: Container(
+                  height: 200,
+                  child: SelectableText(
+                    pushMessage,
+                    style: TextStyle(color: Colors.black, fontSize: 16),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextButton(
+                onPressed: () {
+                  pushConnector.register(onLaunch: (pushType, message) {
+                    pushMessage = message.toString();
+                    setState(() {});
+                  }, onToken: (pushType, token) {
+                    print("token: $token");
+                    this.pushToken = "${pushType}:$token";
+                    setState(() {});
+                  });
+                },
+                child: Text(
+                  "注册",
+                  style: TextStyle(fontSize: 18),
+                )),
+            TextButton(
+                onPressed: () {
+                  pushConnector.unregister();
+                  pushMessage = "";
+                  pushToken = "";
+                  setState(() {});
+                },
+                child: Text(
+                  "取消注册",
+                  style: TextStyle(fontSize: 18),
+                ))
           ],
         ),
       ),

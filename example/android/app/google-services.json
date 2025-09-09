@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "215324167351",
+    "project_id": "pushdemo-60e6d",
+    "storage_bucket": "pushdemo-60e6d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:215324167351:android:4c7828a16bbd3ea65a1132",
+        "android_client_info": {
+          "package_name": "com.shingo.push.demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZp7Kam42svgfzl6zbCagd_ihPkJb9WSM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

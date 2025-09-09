@@ -3,6 +3,7 @@ plugins {
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
     id "com.huawei.agconnect"
+    id "com.google.gms.google-services"
 }
 
 def localProperties = new Properties()
@@ -24,7 +25,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.lianke.talk"
+    namespace "com.shingo.push.demo"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -36,20 +37,21 @@ android {
         release {
             keyAlias 'lianke'
             keyPassword '123456'
-            storeFile file('../lianke.keystore')
+            storeFile file('../demo.keystore')
             storePassword '123456'
         }
     }
 
     defaultConfig {
-        applicationId "com.lianke.talk"
+        applicationId "com.shingo.push.demo"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 21
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         ndk {
+            abiFilters.clear()
             abiFilters 'arm64-v8a'
         }
     }
@@ -58,9 +60,17 @@ android {
         release {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.release
+            ndk {
+                abiFilters.clear()
+                abiFilters 'arm64-v8a'
+            }
         }
         debug {
             signingConfig signingConfigs.release
+            ndk {
+                abiFilters.clear()
+                abiFilters 'arm64-v8a'
+            }
         }
     }
 }
