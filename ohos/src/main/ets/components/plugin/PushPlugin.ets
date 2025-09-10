@@ -50,13 +50,19 @@ export default class PushPlugin implements FlutterPlugin, MethodCallHandler, Abi
 
 
   onLaunchAbility(parameters: Record<string, Object>) {
-    if (parameters["_push_notifyid"] && this.hasRegister) {
-      hilog.info(0x0000, 'PushKit', `Launch Parameters ${JSON.stringify(parameters)}`);
-      this.channel?.invokeMethod("onLaunch", {
-        "type": "HarmonyOS",
-        "message": parameters
-      })
+    if (parameters["_push_notifyid"]) {
+        if(this.hasRegister){
+              hilog.info(0x0000, 'PushKit', `Launch Parameters ${JSON.stringify(parameters)}`);
+              this.channel?.invokeMethod("onLaunch", {
+                "type": "HarmonyOS",
+                "message": parameters
+              })
+              this.launchParameters = null
+          }
+    }else{
+        this.launchParameters = null
     }
+
   }
 
   getUniqueClassName(): string {
