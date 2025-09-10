@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.heytap.msp.push.HeytapPushManager;
 import com.heytap.msp.push.callback.ICallBackResultService;
+import com.hihonor.push.sdk.HonorPushCallback;
+import com.hihonor.push.sdk.HonorPushClient;
 import com.huawei.hms.aaid.HmsInstanceId;
 import com.huawei.hms.api.ConnectionResult;
 import com.huawei.hms.api.HuaweiApiAvailability;
@@ -24,6 +26,7 @@ import com.huawei.hms.push.HmsMessageService;
 import com.huawei.hms.push.HmsMessaging;
 import com.huawei.hms.push.RemoteMessage;
 import com.huawei.hms.support.api.push.service.HmsMsgService;
+import com.shingo.push.honor.HonorPushMsgService;
 import com.shingo.push.huawei.RemoteMessageUtils;
 import com.shingo.push.utils.BundleUtils;
 import com.shingo.push.utils.MainThreadUtil;
@@ -125,13 +128,26 @@ public class PushKit {
 
                         @Override
                         public void onFail(Integer integer) {
-                            Log.e(TAG, "VIVO推送失败:" + integer);
+                            Log.e(TAG, "获取VIVO推送失败:" + integer);
                         }
                     });
                 } else {
-                    Log.e(TAG, "VIVO推送失败:" + state);
+                    Log.e(TAG, "获取VIVO推送失败:" + state);
                 }
 
+            });
+        } else if (isSupport(PushType.Honor)) {
+            HonorPushClient.getInstance().init(context, true);
+            HonorPushClient.getInstance().getPushToken(new HonorPushCallback<String>() {
+                @Override
+                public void onSuccess(String s) {
+                    onToken(PushType.Honor, s);
+                }
+
+                @Override
+                public void onFailure(int i, String s) {
+                    Log.e(TAG, "获取Honor推送失败:" + (i) + ":" + s);
+                }
             });
         }
 
@@ -139,7 +155,7 @@ public class PushKit {
             FirebaseMessaging.getInstance().getToken()
                     .addOnCompleteListener(task -> {
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                            Log.e(TAG, "Fetching FCM registration token failed", task.getException());
                             return;
                         }
                         // Get new FCM registration token
@@ -149,6 +165,7 @@ public class PushKit {
                         }
                     });
         }
+
 
         if (this.cachedMessage != null && this.cachedPushType != null) {
             onMessageClick(cachedPushType, cachedMessage);
@@ -172,6 +189,18 @@ public class PushKit {
             PushClient.getInstance(context).turnOffPush(new IPushActionListener() {
                 @Override
                 public void onStateChanged(int i) {
+
+                }
+            });
+        } else if (isSupport(PushType.Honor)) {
+            HonorPushClient.getInstance().deletePushToken(new HonorPushCallback<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+
+                }
+
+                @Override
+                public void onFailure(int i, String s) {
 
                 }
             });
@@ -209,6 +238,11 @@ public class PushKit {
             return !BuildConfig.VIVO_APP_ID.isEmpty() && !BuildConfig.VIVO_APP_KEY.isEmpty() && PushClient.getInstance(context).isSupport();
         }
 
+        if (pushType == PushType.Honor) {
+            boolean isSupport = HonorPushClient.getInstance().checkSupportHonorPush(context);
+            return !BuildConfig.HONOR_APP_ID.isEmpty() && BuildConfig.HONOR_SERVICE_EXIST && isSupport;
+        }
+
         if (pushType == PushType.FCM) {
             /// 是否支持FCM
             return BuildConfig.FIREBASE_SERVICE_EXIST && GoogleApiAvailabilityLight.getInstance().isGooglePlayServicesAvailable(context) == com.google.android.gms.common.ConnectionResult.SUCCESS;
@@ -242,6 +276,7 @@ public class PushKit {
     public void handleIntent(Intent intent) {
         Bundle bundleExtras = intent.getExtras();
         if (bundleExtras != null) {
+            Log.e(TAG, "intent bundle" + MapUtils.toMap(BundleUtils.convertJSONObject(bundleExtras)));
             if (bundleExtras.containsKey("google.message_id") && isSupport(PushType.FCM)) {
                 Map<String, Object> message = MapUtils.toMap(BundleUtils.convertJSONObject(bundleExtras));
                 PushKit.instance.onMessageClick(PushType.FCM, message);
@@ -265,6 +300,10 @@ public class PushKit {
                 ///vivo
                 Map<String, Object> message = MapUtils.toMap(BundleUtils.convertJSONObject(bundleExtras));
                 PushKit.instance.onMessageClick(PushType.ViVo, message);
+            } else if (isSupport(PushType.Honor)) {
+                ///Honor推送目前没有什么特殊标志来识别是否点击了通知打开的,业务方自己处理
+                Map<String, Object> message = MapUtils.toMap(BundleUtils.convertJSONObject(bundleExtras));
+                PushKit.instance.onMessageClick(PushType.Honor, message);
             } else if (isSupport(PushType.Oppo)) {
                 ///oppo推送目前没有什么特殊标志来识别是否点击了通知打开的,业务方自己处理
                 Map<String, Object> message = MapUtils.toMap(BundleUtils.convertJSONObject(bundleExtras));

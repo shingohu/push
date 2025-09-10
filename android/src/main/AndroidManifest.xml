@@ -10,6 +10,12 @@
         </intent>
     </queries>
 
+    <queries>
+        <intent>
+            <action android:name="com.hihonor.push.action.BIND_PUSH_SERVICE" />
+        </intent>
+    </queries>
+
     <application>
 
 
@@ -113,6 +119,20 @@
         <meta-data
             android:name="firebase_analytics_collection_enabled"
             android:value="false" />
+
+<!--        荣耀推送-->
+        <meta-data
+            android:name="com.hihonor.push.app_id"
+            android:value="@string/honor_app_id" />
+
+        <service
+            android:name=".honor.HonorPushMsgService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.hihonor.push.action.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
 
     </application>
 

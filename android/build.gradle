@@ -38,10 +38,15 @@ if (OPPO_APP_SECRET == null) {
 if (OPPO_APP_KEY == null) {
     OPPO_APP_KEY = ""
 }
+def HONOR_APP_ID = localProperties.getProperty('HONOR_APP_ID')
+if (HONOR_APP_ID == null) {
+    HONOR_APP_ID = ""
+}
 
 
 def HUAWEI_AGC_SERVICE_EXIST = rootProject.file('app/agconnect-services.json').exists()
 def FIREBASE_SERVICE_EXIST = rootProject.file('app/google-services.json').exists()
+def HONOR_SERVICE_EXIST = rootProject.file('mcs-services.json').exists()
 
 
 import java.security.MessageDigest
@@ -85,10 +90,6 @@ apply plugin: 'com.android.library'
 android {
     compileSdk 35
     namespace "com.shingo.push"
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
 
     defaultConfig {
         minSdkVersion 21
@@ -106,10 +107,13 @@ android {
         buildConfigField('String', 'VIVO_APP_KEY', VIVO_APP_KEY)
         buildConfigField('String', 'OPPO_APP_SECRET', OPPO_APP_SECRET)
         buildConfigField('String', 'OPPO_APP_KEY', OPPO_APP_KEY)
+        buildConfigField('String', 'HONOR_APP_ID', HONOR_APP_ID)
         buildConfigField('boolean', 'HUAWEI_AGC_SERVICE_EXIST', HUAWEI_AGC_SERVICE_EXIST.toString())
         buildConfigField('boolean', 'FIREBASE_SERVICE_EXIST', FIREBASE_SERVICE_EXIST.toString())
+        buildConfigField('boolean', 'HONOR_SERVICE_EXIST', HONOR_SERVICE_EXIST.toString())
         resValue 'string', 'vivo_app_id', VIVO_APP_ID
         resValue 'string', 'vivo_app_key', VIVO_APP_KEY
+        resValue 'string', 'honor_app_id', HONOR_APP_ID
     }
     buildFeatures {
         buildConfig true  // 确保这一行存在且为 true
@@ -121,6 +125,7 @@ android {
         implementation 'com.huawei.hms:push:6.13.0.300'
         implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
         implementation "com.google.firebase:firebase-messaging"
+        implementation 'com.hihonor.mcs:push:8.0.12.307'
         // 设备兼容框架：https://github.com/getActivity/DeviceCompat
 //        implementation 'com.github.getActivity:DeviceCompat:1.6'
     }
