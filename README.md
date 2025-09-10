@@ -22,7 +22,7 @@ FCM(https://firebase.google.cn/docs/cloud-messaging/android/first-message?hl=el)
 
 荣耀(https://developer.honor.com/cn/docs/11002/guides/build-info)
 
-
+鸿蒙(https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/push-kit-introduction)
 
 FCM优先支持,比如小米国际版,虽然也能命中支持,但是可能获取不到Token,这时候如果支持FCM会返回FCM的Token
 

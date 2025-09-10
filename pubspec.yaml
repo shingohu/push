@@ -33,6 +33,8 @@ flutter:
         pluginClass: PushPlugin
       ios:
         pluginClass: PushPlugin
+      ohos:
+        pluginClass: PushPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

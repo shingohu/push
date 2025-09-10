@@ -67,9 +67,7 @@ public class PushPlugin implements FlutterPlugin, MethodCallHandler, ActivityAwa
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         String method = call.method;
-        if ("hasPermission".equals(method)) {
-            result.success(hasPermission());
-        } else if ("requestPermission".equals(method)) {
+        if ("requestPermission".equals(method)) {
             requestPermission(result);
         } else if ("openNotificationSettings".equals(method)) {
             gotoNotificationSetting();

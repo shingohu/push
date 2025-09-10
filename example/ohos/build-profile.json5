@@ -1,0 +1,53 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storeFile": "/Users/shingo/develop/hujie/push/example/ohos/keystore.p12",
+          "storePassword": "00000018CF4C267E731FCDBF07112F9ED3631BD4AB9A93E5C9115E84395C9DC4E315953A643209A4",
+          "keyAlias": "keystore",
+          "keyPassword": "000000183238BF81A3656FABF5978C95DAC94A8D07FD98D4E5F2063B36745F030E7168185C7BCF4F",
+          "signAlg": "SHA256withECDSA",
+          "profile": "/Users/shingo/develop/hujie/push/example/ohos/keystore_push_debug.p7b",
+          "certpath": "/Users/shingo/develop/hujie/push/example/ohos/keystore_push_debug.cer"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS",
+        "targetSdkVersion": "5.1.1(19)"
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "profile"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -44,9 +44,7 @@ func getFlutterError(_ error: Error) -> FlutterError {
                 return
             }
             result(nil)
-    
-        case "hasPermission":
-            checkPermission(result: result)
+
         case "requestPermission":
             requestPermission(result:result)
         case "unregister":
@@ -84,22 +82,7 @@ func getFlutterError(_ error: Error) -> FlutterError {
 
     }
     
-    
-    
-    ///判断通知权限
-    func checkPermission(result: @escaping FlutterResult){
-        UNUserNotificationCenter.current().getNotificationSettings {  (settings) in
-            let status = settings.authorizationStatus
-            if(status == .denied){
-                result(false)
-            }else if(status == .notDetermined){
-                result(false)
-            }else{
-                result(true)
-            }
-            
-        }
-    }
+
    
     
     func requestPermission(result: @escaping FlutterResult){

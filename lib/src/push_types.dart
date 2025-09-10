@@ -1,4 +1,4 @@
-enum PushType { APNS, XiaoMi, ViVo, Oppo, FCM, Huawei, Honor }
+enum PushType { APNS, XiaoMi, ViVo, Oppo, FCM, Huawei, Honor, HarmonyOS }
 
 extension StringPushType on PushType {
   String? coverToString() {
@@ -23,6 +23,9 @@ extension StringPushType on PushType {
     }
     if (this == PushType.Honor) {
       return "Honor";
+    }
+    if (this == PushType.HarmonyOS) {
+      return "HarmonyOS";
     }
 
     return null;
@@ -51,6 +54,9 @@ PushType? coverStringToPushType(String? pushTypeString) {
   }
   if ("Honor" == pushTypeString) {
     return PushType.Honor;
+  }
+  if ("HarmonyOS" == pushTypeString) {
+    return PushType.HarmonyOS;
   }
 
   return null;

@@ -62,7 +62,6 @@ class PushConnector {
 
   ///取消注册
   Future<void> unregister() async {
-    await clearAll();
     await _channel.invokeMethod('unregister');
     _onLaunch = null;
     _onToken = null;
@@ -71,6 +70,9 @@ class PushConnector {
   ///打开通知设置(iOS上跳转到设置)
   Future<void> openNotificationSettings() async {
     Completer completer = Completer();
+
+    ///鸿蒙侧没有处理弹出通知设置页面时的生命周期
+    ///https://gitcode.com/openharmony-tpc/flutter_flutter/issues/1191
     AppLifecycleListener lifecycleListener = AppLifecycleListener(onResume: () {
       if (!completer.isCompleted) {
         completer.complete();
@@ -84,11 +86,6 @@ class PushConnector {
   ///清除所有通知
   Future<void> clearAll() async {
     return _channel.invokeMethod("clearAll");
-  }
-
-  ///检查是否授权(android13 以及iOS未请求权限之前都是false)
-  Future<bool> get isPermissionGranted async {
-    return await _channel.invokeMethod("checkPermission");
   }
 
   ///请求权限(如果请求过则直接返回结果)

@@ -12,7 +12,13 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print("state: $state");
+  }
+
   PushConnector pushConnector = PushConnector();
 
   String pushMessage = "";
@@ -21,7 +27,10 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    pushConnector.requestPermission();
+    WidgetsBinding.instance.addObserver(this);
+    pushConnector.requestPermission().then((success) {
+      print("是否有通知权限:$success");
+    });
   }
 
   @override
@@ -82,6 +91,14 @@ class _MyAppState extends State<MyApp> {
                 },
                 child: Text(
                   "取消注册",
+                  style: TextStyle(fontSize: 18),
+                )),
+            TextButton(
+                onPressed: () {
+                  pushConnector.openNotificationSettings();
+                },
+                child: Text(
+                  "跳转通知",
                   style: TextStyle(fontSize: 18),
                 ))
           ],
