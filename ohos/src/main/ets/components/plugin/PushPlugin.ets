@@ -158,3 +158,4 @@ export default class PushPlugin implements FlutterPlugin, MethodCallHandler, Abi
     }
   }
 }
+
