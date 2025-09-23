@@ -84,7 +84,8 @@ class PushConnector {
       lifecycleListener.dispose();
     } else {
       ///鸿蒙侧认为弹出通知设置页面是应用内弹窗,所有不影响应用的生命周期,也没有通知设置页面关闭事件
-      ///所有鸿蒙侧无法根据应用生命周期或者关闭事件来重新获取允许通知开关状态
+      ///所以鸿蒙侧无法根据应用生命周期或者关闭事件来重新获取允许通知开关状态
+      ///但是鸿蒙侧可以页面组件的focus来判断通知设置页面是否关闭
       await _channel.invokeMethod("openNotificationSettings");
     }
   }

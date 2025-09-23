@@ -94,8 +94,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                   style: TextStyle(fontSize: 18),
                 )),
             TextButton(
-                onPressed: () {
-                  pushConnector.openNotificationSettings();
+                onPressed: () async {
+                  await pushConnector.openNotificationSettings();
                 },
                 child: Text(
                   "跳转通知",

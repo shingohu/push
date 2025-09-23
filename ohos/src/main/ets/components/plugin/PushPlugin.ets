@@ -13,7 +13,7 @@ import {
 import { notificationManager } from '@kit.NotificationKit';
 import { pushService } from '@kit.PushKit';
 import { AbilityConstant, common, Want } from '@kit.AbilityKit';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 /** PushPlugin **/
@@ -51,16 +51,16 @@ export default class PushPlugin implements FlutterPlugin, MethodCallHandler, Abi
 
   onLaunchAbility(parameters: Record<string, Object>) {
     if (parameters["_push_notifyid"]) {
-        if(this.hasRegister){
-              hilog.info(0x0000, 'PushKit', `Launch Parameters ${JSON.stringify(parameters)}`);
-              this.channel?.invokeMethod("onLaunch", {
-                "type": "HarmonyOS",
-                "message": parameters
-              })
-              this.launchParameters = null
-          }
-    }else{
+      if (this.hasRegister) {
+        hilog.info(0x0000, 'PushKit', `Launch Parameters ${JSON.stringify(parameters)}`);
+        this.channel?.invokeMethod("onLaunch", {
+          "type": "HarmonyOS",
+          "message": parameters
+        })
         this.launchParameters = null
+      }
+    } else {
+      this.launchParameters = null
     }
 
   }
@@ -86,16 +86,7 @@ export default class PushPlugin implements FlutterPlugin, MethodCallHandler, Abi
     if (call.method == "requestPermission") {
       this.requestPermission(result)
     } else if (call.method == "openNotificationSettings") {
-      if (this.context) {
-        notificationManager.openNotificationSettings(this.context).then(() => {
-          hilog.info(0x0000, 'PushKit', `[ANS] openNotificationSettings success`);
-          result.success(true)
-        }).catch((err: BusinessError) => {
-          hilog.error(0x0000, 'PushKit',
-            `[ANS] openNotificationSettings failed, code is ${err.code}, message is ${err.message}`);
-          result.success(false)
-        });
-      }
+      this.openNotificationSettings(result)
     } else if (call.method == "clearAll") {
       notificationManager.cancelAll();
       result.success(true)
@@ -112,6 +103,55 @@ export default class PushPlugin implements FlutterPlugin, MethodCallHandler, Abi
       result.notImplemented()
     }
   }
+
+  async openNotificationSettings(result: MethodResult) {
+    if (this.context) {
+      if (deviceInfo.sdkApiVersion >= 13) {
+        try {
+          let isfocusable = false;
+          await notificationManager.openNotificationSettings(this.context)
+          let uiContext = this.context.windowStage.getMainWindowSync().getUIContext();
+          let viewId = uiContext.getSharedLocalStorage()?.get<string>("viewId")
+          if (viewId) {
+            let node: FrameNode | null = uiContext.getFrameNodeById(viewId)
+            if (node) {
+              let parent = this.findTopRoot(node)
+              if (parent) {
+                parent.commonEvent.setOnFocus(() => {
+                  if (!isfocusable) {
+                    isfocusable = true;
+                    parent?.commonEvent.setOnFocus(undefined)
+                    result.success(true)
+                  }
+                })
+                return
+              }
+            }
+          }
+          result.success(true)
+        } catch (err) {
+          hilog.error(0x0000, 'PushKit',
+            `[ANS] openNotificationSettings failed, code is ${err.code}, message is ${err.message}`);
+          result.success(false)
+        }
+      } else {
+        result.success(false)
+      }
+    } else {
+      result.success(false)
+    }
+  }
+
+
+  findTopRoot(childNode: FrameNode): FrameNode {
+    let top = childNode
+    if (top.getParent()) {
+      return this.findTopRoot(top.getParent()!)
+    } else {
+      return top
+    }
+  }
+
 
   async register() {
     try {
